@@ -48,9 +48,10 @@ def gather_data(curr_file, prev_file):
     sample = 501
     print "sample first checkout neighbors:", [item_info[x][1][1] for x in checkouts_to_items[items_to_checkouts[c[sample]][0]]]
     print "sample second checkout neighbors:", [item_info[x][1][1] for x in checkouts_to_items[items_to_checkouts[c[sample]][1]]]
+    print "hmm:", getMatches(c[sample], checkouts_to_items, items_to_checkouts, item_info)
 
 def process_csv(a_csv, curr_checkout_id, person_index):
-    checkouts = {}
+    checkouts = {}  
     items = {}
     item_info = {}
     prev_person = None
@@ -86,5 +87,8 @@ def process_csv(a_csv, curr_checkout_id, person_index):
             curr_checkout.add(item_id)
 
     return checkouts, items, item_info, curr_checkout_id
+#returns all of the items a particular item has been checked out with
+def getMatches(item, ci, ic, ii):
+    return map(lambda chk: [ii[x] for x in ci[chk]], ic[item])
 if __name__ == "__main__":
     main()
