@@ -2,8 +2,8 @@ import sys
 import csv
 
 def main():
-    gather_data(open(sys.argv[1]), open(sys.argv[2]))
-
+    checkouts_to_items, items_to_checkouts, item_info, lookup_info = gather_data(open(sys.argv[1]), open(sys.argv[2]))
+    get_input(checkouts_to_items, items_to_checkouts, item_info, lookup_info) 
 
 def gather_data(curr_file, prev_file):
     curr_csv = csv.reader(curr_file)
@@ -14,11 +14,13 @@ def gather_data(curr_file, prev_file):
     items_to_checkouts = {}
     #map from item id to call num, title, author, published
     item_info = {}
+    #map from call numbers and ISBNs to list of item id 
+    lookup_info = {}
 
     curr_checkout_id = 1
 
-    checkouts_to_items, items1, item_info1, curr_checkout_id = process_csv(curr_csv, curr_checkout_id, 6)
-    checkouts2, items2, item_info2, curr_checkout_id = process_csv(prev_csv, curr_checkout_id, 8)
+    checkouts_to_items, items1, item_info1, lookup_info1, curr_checkout_id = process_csv(curr_csv, curr_checkout_id, 6)
+    checkouts2, items2, item_info2, lookup_info2, curr_checkout_id = process_csv(prev_csv, curr_checkout_id, 8)
 
     #join dicts together
     #ok since they are distinct
@@ -31,6 +33,14 @@ def gather_data(curr_file, prev_file):
             items_to_checkouts[x] += items2[x]
         else: 
             items_to_checkouts[x] = items2[x]
+    #same for lookup info 
+    for x in lookup_info1:
+        lookup_info[x] = lookup_info1[x]
+    for x in lookup_info2:
+        if x in lookup_info:
+            lookup_info[x] += lookup_info2[x]
+        else: 
+            lookup_info[x] = lookup_info2[x]
     #not distinct, must check before combining (but don't need to join them)
     for x in item_info1:
         item_info[x] = item_info1[x]
@@ -45,15 +55,18 @@ def gather_data(curr_file, prev_file):
     print "there are", b, "big checkouts"
     c = [x for x in items_to_checkouts if len(items_to_checkouts[x]) >= 2]
     print "there are", len(c), "items appearing in at least two checkouts"
-    sample = 501
-    print "sample first checkout neighbors:", [item_info[x][1][1] for x in checkouts_to_items[items_to_checkouts[c[sample]][0]]]
-    print "sample second checkout neighbors:", [item_info[x][1][1] for x in checkouts_to_items[items_to_checkouts[c[sample]][1]]]
-    print "hmm:", getMatches(c[sample], checkouts_to_items, items_to_checkouts, item_info)
+    print "there are", len(lookup_info), "different call numbers / isbns"
+    # sample = 501
+    # print "sample first checkout neighbors:", [item_info[x][1][1] for x in checkouts_to_items[items_to_checkouts[c[sample]][0]]]
+    # print "sample second checkout neighbors:", [item_info[x][1][1] for x in checkouts_to_items[items_to_checkouts[c[sample]][1]]]
+    # print "hmm:", get_matches(c[sample], checkouts_to_items, items_to_checkouts, item_info)
+    return checkouts_to_items, items_to_checkouts, item_info, lookup_info
 
 def process_csv(a_csv, curr_checkout_id, person_index):
     checkouts = {}  
     items = {}
     item_info = {}
+    lookup_info = {}
     prev_person = None
     curr_checkout = set()
     for line in a_csv:
@@ -67,16 +80,32 @@ def process_csv(a_csv, curr_checkout_id, person_index):
         cite_info = line[15:20]
         isbn_dirty = line[22]
 
+        #construct dictionaries of call no / isbn -> item ids
+        clean_call_no = cleanup_call_no(call_no)
+        clean_isbns = cleanup_isbn(isbn_dirty)
+        if clean_call_no not in lookup_info:
+            lookup_info[clean_call_no] = [item_id]
+        else:
+            lookup_info[clean_call_no] += [item_id]
+        for x in cleanup_isbn(isbn_dirty):
+            if x not in lookup_info:
+                lookup_info[x] = [item_id]
+            else:
+                lookup_info[x] += [item_id]
+
         #add items to dictionary 
-        item_info[item_id] = (call_no, cite_info, isbn_dirty)
+        if item_id not in item_info:
+            item_info[item_id] = (call_no, cite_info, (all_time_checkouts, recent_checkouts), isbn_dirty)
+        #add checkout information
         if item_id not in items:
             items[item_id] = [curr_checkout_id]
         else:
             items[item_id].append(curr_checkout_id)
 
-        #compile a set of checkouts
+        #if there's no data for the person, stop
         if curr_person == "":
             break
+        #compile a set of checkouts
         if curr_person == prev_person:    
             curr_checkout.add(item_id)
         else:
@@ -86,9 +115,45 @@ def process_csv(a_csv, curr_checkout_id, person_index):
             curr_checkout = set()
             curr_checkout.add(item_id)
 
-    return checkouts, items, item_info, curr_checkout_id
+    return checkouts, items, item_info, lookup_info, curr_checkout_id
+
 #returns all of the items a particular item has been checked out with
-def getMatches(item, ci, ic, ii):
+# #functionalprogramming
+def get_matches(item, ci, ic, ii):
     return map(lambda chk: [ii[x] for x in ci[chk]], ic[item])
+
+#returns the call number in a standardized format
+#TODO: actually do that
+def cleanup_call_no(call_no):
+   return call_no 
+
+#returns a list of isbns in a standardized format
+#TODO: actually do that
+def cleanup_isbn(isbn_dirty):
+   return isbn_dirty 
+
+def get_input(ci, ic, ii, li):
+    #read from standard in
+    while True:
+        try:
+            search = raw_input("Enter an id to find matches for: ")
+        except EOFError:
+            print ""
+            break
+        matches = get_recs(search, ci, ic, ii, li)
+        print "possible matches:"
+        print matches
+    
+def get_recs(search_term, checkouts_to_items, items_to_checkouts, item_info, lookup_info):
+    print "search term is", search_term
+    if search_term not in lookup_info:
+        return []
+    ids = lookup_info[search_term]
+    print "corresponding id(s):", ids
+    matches = []
+    for item_id in ids:
+        matches += get_matches(item_id, checkouts_to_items, items_to_checkouts, item_info)
+    return matches
+    
 if __name__ == "__main__":
     main()
