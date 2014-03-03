@@ -1,9 +1,13 @@
 import sys
 import csv
+import re
 
 def main():
-    checkouts_to_items, items_to_checkouts, item_info, lookup_info = gather_data(open(sys.argv[1]), open(sys.argv[2]))
-    get_input(checkouts_to_items, items_to_checkouts, item_info, lookup_info) 
+    if len(sys.argv) != 3:
+        print "usage: python analyze.py curr_sorted prev_sorted"
+    else:
+        checkouts_to_items, items_to_checkouts, item_info, lookup_info = gather_data(open(sys.argv[1]), open(sys.argv[2]))
+        get_input(checkouts_to_items, items_to_checkouts, item_info, lookup_info) 
 
 def gather_data(curr_file, prev_file):
     curr_csv = csv.reader(curr_file)
@@ -120,20 +124,29 @@ def process_csv(a_csv, curr_checkout_id, person_index):
 #returns all of the items a particular item has been checked out with
 # #functionalprogramming
 def get_matches(item, ci, ic, ii):
-    return map(lambda chk: [ii[x] for x in ci[chk]], ic[item])
+    matches = []
+    checkouts = ic[item]
+    for checkout in checkouts: 
+        checkout_matches = [ii[x] for x in ci[checkout]]
+        matches += checkout_matches
+    return matches
 
 #returns the call number in a standardized format
 #TODO: actually do that
 def cleanup_call_no(call_no):
-   return call_no 
+    return call_no 
 
 #returns a list of isbns in a standardized format
-#TODO: actually do that
+#isbns are horrible in the data: split on everything, use things that are 10 or 13 digits
 def cleanup_isbn(isbn_dirty):
-   return isbn_dirty 
+    tokens = isbn_dirty.split()
+    only_digits = map(lambda x: re.sub("[^0-9]","",x), tokens)
+    isbns = [x for x in only_digits if len(x) == 10 or len(x) == 13]
+    return isbns 
 
 def get_input(ci, ic, ii, li):
     #read from standard in
+    print "Ctrl-d to exit."
     while True:
         try:
             search = raw_input("Enter an id to find matches for: ")
@@ -142,14 +155,19 @@ def get_input(ci, ic, ii, li):
             break
         matches = get_recs(search, ci, ic, ii, li)
         print "possible matches:"
-        print matches
-    
+        pretty_matches = get_pretty_matches(matches)
+        for x in pretty_matches:
+            print x
+
+def get_pretty_matches(matches):
+    return [x[1] for x in matches]
+
 def get_recs(search_term, checkouts_to_items, items_to_checkouts, item_info, lookup_info):
-    print "search term is", search_term
+    # print "search term is", search_term
     if search_term not in lookup_info:
         return []
     ids = lookup_info[search_term]
-    print "corresponding id(s):", ids
+    #print "corresponding id(s):", ids
     matches = []
     for item_id in ids:
         matches += get_matches(item_id, checkouts_to_items, items_to_checkouts, item_info)
