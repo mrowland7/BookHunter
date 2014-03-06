@@ -6,8 +6,8 @@ def main():
     if len(sys.argv) != 3:
         print "usage: python analyze.py curr_sorted prev_sorted"
     else:
-        checkouts_to_items, items_to_checkouts, item_info, lookup_info = gather_data(open(sys.argv[1]), open(sys.argv[2]))
-        get_input(checkouts_to_items, items_to_checkouts, item_info, lookup_info) 
+        item_map, item_info, lookup_info = gather_data(open(sys.argv[1]), open(sys.argv[2]))
+        get_input(item_map, item_info, lookup_info) 
 
 def gather_data(curr_file, prev_file):
     curr_csv = csv.reader(curr_file)
@@ -52,19 +52,27 @@ def gather_data(curr_file, prev_file):
         if x not in item_info:
             item_info[x] = item_info2[x]
 
+    #go from items -> checkouts, checkouts -> items to items -> items
+    item_map = {}
+    for item in items_to_checkouts:
+        item_map[item] = []
+        for checkout in items_to_checkouts[item]:
+            if checkout in checkouts_to_items:
+                item_map[item] += checkouts_to_items[checkout]
+
 
     #print some interesting information 
-    print "there are", len(checkouts_to_items), "different checkouts"
-    b = len([x for x in checkouts_to_items if len(checkouts_to_items[x]) >= 12])
-    print "there are", b, "big checkouts"
-    c = [x for x in items_to_checkouts if len(items_to_checkouts[x]) >= 2]
-    print "there are", len(c), "items appearing in at least two checkouts"
-    print "there are", len(lookup_info), "different call numbers / isbns"
+    #print "there are", len(checkouts_to_items), "different checkouts"
+    #b = len([x for x in checkouts_to_items if len(checkouts_to_items[x]) >= 12])
+    #print "there are", b, "big checkouts"
+    #c = [x for x in items_to_checkouts if len(items_to_checkouts[x]) >= 2]
+    #print "there are", len(c), "items appearing in at least two checkouts"
+    #print "there are", len(lookup_info), "different call numbers / isbns"
     # sample = 501
     # print "sample first checkout neighbors:", [item_info[x][1][1] for x in checkouts_to_items[items_to_checkouts[c[sample]][0]]]
     # print "sample second checkout neighbors:", [item_info[x][1][1] for x in checkouts_to_items[items_to_checkouts[c[sample]][1]]]
     # print "hmm:", get_matches(c[sample], checkouts_to_items, items_to_checkouts, item_info)
-    return checkouts_to_items, items_to_checkouts, item_info, lookup_info
+    return item_map, item_info, lookup_info
 
 def process_csv(a_csv, curr_checkout_id, person_index):
     checkouts = {}  
@@ -123,18 +131,13 @@ def process_csv(a_csv, curr_checkout_id, person_index):
 
 #returns all of the items a particular item has been checked out with
 # #functionalprogramming
-def get_matches(item, ci, ic, ii):
-    matches = []
-    checkouts = ic[item]
-    for checkout in checkouts: 
-        checkout_matches = [ii[x] for x in ci[checkout]]
-        matches += checkout_matches
-    return matches
+def get_matches(item, im, ii):
+    return [ii[x] for x in im[item]]
 
 #returns the call number in a standardized format
-#TODO: actually do that
+#remove spaces, send everything to lower case
 def cleanup_call_no(call_no):
-    return call_no 
+    return "".join(call_no.lower().split())
 
 #returns a list of isbns in a standardized format
 #isbns are horrible in the data: split on everything, use things that are 10 or 13 digits
@@ -144,7 +147,7 @@ def cleanup_isbn(isbn_dirty):
     isbns = [x for x in only_digits if len(x) == 10 or len(x) == 13]
     return isbns 
 
-def get_input(ci, ic, ii, li):
+def get_input(im, ii, li):
     #read from standard in
     print "Ctrl-d to exit."
     while True:
@@ -153,7 +156,7 @@ def get_input(ci, ic, ii, li):
         except EOFError:
             print ""
             break
-        matches = get_recs(search, ci, ic, ii, li)
+        matches = get_recs(search, im, ii, li)
         print "possible matches:"
         pretty_matches = get_pretty_matches(matches)
         for x in pretty_matches:
@@ -162,15 +165,17 @@ def get_input(ci, ic, ii, li):
 def get_pretty_matches(matches):
     return [x[1] for x in matches]
 
-def get_recs(search_term, checkouts_to_items, items_to_checkouts, item_info, lookup_info):
+def get_recs(search_term, item_map, item_info, lookup_info):
     # print "search term is", search_term
-    if search_term not in lookup_info:
-        return []
-    ids = lookup_info[search_term]
-    #print "corresponding id(s):", ids
+    search_term_call_no = cleanup_call_no(search_term)
+    ids = []
+    if search_term in lookup_info:
+        ids += lookup_info[search_term]
+    if search_term_call_no in lookup_info:
+        ids += lookup_info[search_term_call_no]
     matches = []
     for item_id in ids:
-        matches += get_matches(item_id, checkouts_to_items, items_to_checkouts, item_info)
+        matches += get_matches(item_id, item_map, item_info)
     return matches
     
 if __name__ == "__main__":
