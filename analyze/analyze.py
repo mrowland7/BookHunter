@@ -9,6 +9,10 @@ def main():
         item_map, item_info, lookup_info = gather_data(open(sys.argv[1]), open(sys.argv[2]))
         get_input(item_map, item_info, lookup_info) 
 
+def init():
+    item_map, item_info, lookup_info = gather_data(open("../data/data_curr_sorted.csv"),
+                                                    open("../data/data_prev_sorted.csv"))
+
 def gather_data(curr_file, prev_file):
     curr_csv = csv.reader(curr_file)
     prev_csv = csv.reader(prev_file)
