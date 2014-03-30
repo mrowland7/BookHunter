@@ -1,5 +1,8 @@
+import sys
 import webapp2
-import analyze
+sys.path.append("../analyze")
+import analyze.analyze as alz
+import json
 
 class MainPage(webapp2.RequestHandler):
     
@@ -14,9 +17,9 @@ class Info(webapp2.RequestHandler):
 
     def post(self):
         self.response.write("<!doctype html><html><body><p> Info Request was:")
-        content = self.request.get('call_no')
-        info = analyze.
-        self.response.write(content)
+        num = self.request.get('call_no')
+        info = alz.get_info(num, item_map, item_info, lookup_info)
+        self.response.write(info)
         self.response.write("</p></body></html>")
 
 class Recommendations(webapp2.RequestHandler):
@@ -25,11 +28,16 @@ class Recommendations(webapp2.RequestHandler):
         self.response.write("Rec page")
 
     def post(self):
-        self.response.write("<!doctype html><html><body><p>Rec Request was:")
-        content = self.request.get('content')
-        self.response.write(content)
-        self.response.write("</p></body></html>")
+        num = self.request.get('call_no')
+        recs = alz.get_recs(num, item_map, item_info, lookup_info)
+        self.response.write(json.dumps(recs))
+        #for rec in recs:
+        #    self.response.write("<p>")
+        #    self.response.write(rec)
+        #    self.response.write("</p>")
 
+item_map, item_info, lookup_info = alz.init()
+print "init finished"
 
 application = webapp2.WSGIApplication([
     ('/', MainPage),
