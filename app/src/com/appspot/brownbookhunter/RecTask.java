@@ -3,6 +3,8 @@ package com.appspot.brownbookhunter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.Callable;
 
 import org.apache.http.HttpResponse;
@@ -17,13 +19,14 @@ import org.json.JSONObject;
 
 import android.util.Log;
 
-public class RecTask implements Callable<JSONObject> {
+public class RecTask implements Callable<List<Book>> {
 
 	private static final String TAG = "RecTask";
 
 	@Override
-	public JSONObject call() throws Exception {
+	public List<Book> call(String callNumber) throws Exception {
 		JSONObject recInfo = null;
+		List<Book> bookRecs = new ArrayList<Book>();
 		String recUrl = "http://brownbookhunter.appspot.com/recs";
 		HttpClient hc = new DefaultHttpClient();
 		try{
@@ -38,6 +41,9 @@ public class RecTask implements Callable<JSONObject> {
 			
 			recInfo = readResponse(response);
 			JSONArray actualResult = (JSONArray) recInfo.get("thing");
+			for (int i = 0; i < actualResult.length(); i++){
+				bookRecs.add(new Book((JSONObject) actualResult.get(i)));
+			}
 			JSONObject firstThing = (JSONObject) actualResult.get(0);
 			
 			Log.d(TAG, "Hopefully this is something?" + firstThing);
@@ -56,7 +62,7 @@ public class RecTask implements Callable<JSONObject> {
 		} finally {
 			hc.getConnectionManager().shutdown();
 		}
-		return recInfo;
+		return bookRecs;
 	}
 
 	private JSONObject readResponse(HttpResponse response) throws IllegalStateException, IOException, JSONException {

@@ -105,6 +105,10 @@ def process_csv(a_csv, curr_checkout_id, person_index):
         #construct dictionaries of call no / isbn -> item ids
         clean_call_no = cleanup_call_no(call_no)
         clean_isbns = cleanup_isbn(isbn_dirty)
+        if barcode not in lookup_info:
+            lookup_info[barcode] = [item_id]
+        else:
+            lookup_info[barcode] += [item_id]
         if clean_call_no not in lookup_info:
             lookup_info[clean_call_no] = [item_id]
         else:
@@ -118,7 +122,7 @@ def process_csv(a_csv, curr_checkout_id, person_index):
         #add items to dictionary 
         if item_id not in item_info:
             #item_info[item_id] = (call_no, cite_info, (all_time_checkouts, recent_checkouts), isbn_dirty)
-            item_info[item_id] = {"call_no": call_no, "author:", cite_info[0], "title": cite_info[1],
+            item_info[item_id] = {"call_no": call_no, "author": cite_info[0], "title": cite_info[1],
                 "pub_place": cite_info[2], "publisher": cite_info[3], "year": cite_info[4],
                 "all_time_checkouts": all_time_checkouts, "recent_checkouts":recent_checkouts, 
                 "isbn_dirty":isbn_dirty}

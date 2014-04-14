@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
+import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
@@ -28,7 +29,7 @@ public class MainActivity extends Activity {
 	private static final String TAG = "MainActivity";
 	private BlockingQueue<Runnable> _workQueue = new LinkedBlockingQueue<Runnable>();
 	private ExecutorService _executor = new ThreadPoolExecutor(10, 10, 1000l, TimeUnit.SECONDS, _workQueue);
-	private Future<JSONObject> _recFuture = null;
+	private Future<List<Book>> _recFuture = null;
 	private Future<JSONObject> _infoFuture = null;
 
 	@Override
@@ -51,7 +52,7 @@ public class MainActivity extends Activity {
 	
 	public void getRecs(View v) {
 		Log.d(TAG, "Getting recs");
-		Callable<JSONObject> getRecTask = new RecTask();
+		Callable<List<Book>> getRecTask = new RecTask();
 		_recFuture = _executor.submit(getRecTask);
 	}
 	
@@ -68,10 +69,10 @@ public class MainActivity extends Activity {
 	protected void checkFutureResults() {
 		while (true){
 			if (_recFuture != null && _recFuture.isDone()){
-				JSONObject recInfo;
+				List<Book> recList;
 				try {
-					recInfo = _recFuture.get();
-					Log.d(TAG, "Rec is done: " + recInfo);
+					recList = _recFuture.get();
+					Log.d(TAG, "Rec is done: there are " + recList.size() + " recommendations");
 				} catch (InterruptedException e) {
 					Log.e(TAG, "rec future interrupted: " + e.getMessage());
 				} catch (ExecutionException e) {
