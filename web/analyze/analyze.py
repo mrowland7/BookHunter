@@ -117,7 +117,11 @@ def process_csv(a_csv, curr_checkout_id, person_index):
 
         #add items to dictionary 
         if item_id not in item_info:
-            item_info[item_id] = (call_no, cite_info, (all_time_checkouts, recent_checkouts), isbn_dirty)
+            #item_info[item_id] = (call_no, cite_info, (all_time_checkouts, recent_checkouts), isbn_dirty)
+            item_info[item_id] = {"call_no": call_no, "author:", cite_info[0], "title": cite_info[1],
+                "pub_place": cite_info[2], "publisher": cite_info[3], "year": cite_info[4],
+                "all_time_checkouts": all_time_checkouts, "recent_checkouts":recent_checkouts, 
+                "isbn_dirty":isbn_dirty}
         #add checkout information
         if item_id not in items:
             items[item_id] = [curr_checkout_id]
