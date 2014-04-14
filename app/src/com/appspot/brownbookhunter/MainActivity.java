@@ -18,11 +18,15 @@ import java.util.concurrent.TimeUnit;
 
 import android.os.Bundle;
 import android.app.Activity;
+import android.content.Intent;
 import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 
 import org.json.*;
+
+import com.google.zxing.IntentIntegrator;
+import com.google.zxing.IntentResult;
 
 
 public class MainActivity extends Activity {
@@ -49,6 +53,8 @@ public class MainActivity extends Activity {
 	
 	public void scan(View v) {
 		Log.d(TAG, "Scanning");
+		IntentIntegrator integrator = new IntentIntegrator(this);
+		integrator.initiateScan();
 	}
 	
 	public void getRecs(View v) {
@@ -78,7 +84,7 @@ public class MainActivity extends Activity {
 					
 					//do stuff with recList, like sorting it 
 					Collections.sort(recList);
-					for (int i = 0; i < 5; i++){
+					for (int i = 0; i < Math.min(5, recList.size()); i++){
 						Log.d(TAG, "Rec number " + (i + 1) + ": " + recList.get(i).getTitle() + ", with all time checkouts = : " + (recList.get(i).getAllTimeCheckouts()));
 					}
 				} catch (InterruptedException e) {
@@ -96,5 +102,18 @@ public class MainActivity extends Activity {
 		}
 		
 	}
+	
+	//result of scanning
+	public void onActivityResult(int requestCode, int resultCode, Intent intent) {
+		  IntentResult scanResult = IntentIntegrator.parseActivityResult(requestCode, resultCode, intent);
+		  if (scanResult != null) {
+			  String barcode = scanResult.getContents();
+			  Log.d(TAG, "Scan result was: " + barcode);
+			  Callable<List<Book>> getRecTask = new RecTask(barcode);
+			  _recFuture = _executor.submit(getRecTask);
+		    // handle scan result
+		  }
+		  // else continue with any other code you need in the method
+		}
 
 }
