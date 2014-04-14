@@ -3,7 +3,10 @@ package com.appspot.brownbookhunter;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class Book implements Comparable<Book>{
+import android.os.Parcel;
+import android.os.Parcelable;
+
+public class Book implements Comparable<Book>, Parcelable{
 	private int allTimeCheckouts;
 	private int recentCheckouts;
 	private String isbn;
@@ -12,7 +15,7 @@ public class Book implements Comparable<Book>{
 	private String publisher;
 	private String publisherPlace;
 	private String title;
-	
+
 	public Book(JSONObject j) throws JSONException {
 		allTimeCheckouts = Integer.parseInt((String) j.get("all_time_checkouts"));
 		recentCheckouts  = Integer.parseInt((String) j.get("recent_checkouts"));
@@ -22,6 +25,19 @@ public class Book implements Comparable<Book>{
 		publisher = (String) j.get("publisher");
 		publisherPlace = (String) j.get("pub_place");
 		title = (String) j.get("title");
+	}
+
+	public Book(Parcel in) {
+		String[] data = new String[8];
+		in.readStringArray(data);
+		allTimeCheckouts = Integer.parseInt(data[0]);
+		recentCheckouts  = Integer.parseInt(data[1]);
+		isbn = data[2];
+		callNumber = data[3];
+		author = data[4];
+		publisher = data[5];
+		publisherPlace = data[6];
+		title = data[7];
 	}
 
 	//negative if less than
@@ -57,8 +73,42 @@ public class Book implements Comparable<Book>{
 	public String getPublisherPlace() {
 		return publisherPlace;
 	}
-	
+
 	public String getTitle() {
 		return title;
 	}
+
+	@Override
+	public int describeContents() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public void writeToParcel(Parcel dest, int flags) {
+		dest.writeStringArray(new String[]{
+				""+allTimeCheckouts,
+				""+recentCheckouts,
+				isbn,
+				callNumber,
+				author,
+				publisher,
+				publisherPlace,
+				title
+		});
+	}
+
+	public static final Parcelable.Creator<Book> CREATOR= new Parcelable.Creator<Book>() {
+
+		@Override
+		public Book createFromParcel(Parcel source) {
+			return new Book(source);  //using parcelable constructor
+		}
+
+		@Override
+		public Book[] newArray(int size) {
+			return new Book[size];
+		}
+	};
+
 }

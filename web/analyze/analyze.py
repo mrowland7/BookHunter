@@ -193,7 +193,7 @@ def get_recs(search_term, item_map, item_info, lookup_info):
     ids = []
     if search_term in lookup_info:
         ids += lookup_info[search_term]
-    if search_term_call_no in lookup_info:
+    elif search_term_call_no in lookup_info:
         ids += lookup_info[search_term_call_no]
     matches = []
     for item_id in ids:

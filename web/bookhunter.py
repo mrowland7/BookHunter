@@ -16,11 +16,9 @@ class Info(webapp2.RequestHandler):
         self.response.write("Info page")
 
     def post(self):
-        self.response.write("<!doctype html><html><body><p> Info Request was:")
         num = self.request.get('call_no')
         info = alz.get_info(num, item_map, item_info, lookup_info)
         self.response.write(info)
-        self.response.write("</p></body></html>")
 
 class Recommendations(webapp2.RequestHandler):
    

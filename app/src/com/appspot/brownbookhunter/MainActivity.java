@@ -1,10 +1,6 @@
 package com.appspot.brownbookhunter;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
-import java.net.URL;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
@@ -35,7 +31,7 @@ public class MainActivity extends Activity {
 	private BlockingQueue<Runnable> _workQueue = new LinkedBlockingQueue<Runnable>();
 	private ExecutorService _executor = new ThreadPoolExecutor(10, 10, 1000l, TimeUnit.SECONDS, _workQueue);
 	private Future<List<Book>> _recFuture = null;
-	private Future<JSONObject> _infoFuture = null;
+	private Future<Book> _infoFuture = null;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -76,10 +72,14 @@ public class MainActivity extends Activity {
 
 	protected void checkFutureResults() {
 		while (true){
-			if (_recFuture != null && _recFuture.isDone()){
-				List<Book> recList;
+			//wait until both rec and info are present to continue to presentation page
+			if (_recFuture != null && _recFuture.isDone() && _infoFuture != null && _infoFuture.isDone()){
+				Book info;
+				ArrayList<Book> recList;
 				try {
-					recList = _recFuture.get();
+					info = _infoFuture.get();
+					recList = (ArrayList<Book>) _recFuture.get();
+					
 					Log.d(TAG, "Rec is done: there are " + recList.size() + " recommendations");
 					
 					//do stuff with recList, like sorting it 
@@ -87,14 +87,24 @@ public class MainActivity extends Activity {
 					for (int i = 0; i < Math.min(5, recList.size()); i++){
 						Log.d(TAG, "Rec number " + (i + 1) + ": " + recList.get(i).getTitle() + ", with all time checkouts = : " + (recList.get(i).getAllTimeCheckouts()));
 					}
+					
+					//start new book info page 
+					Book[] books = new Book[recList.size()];
+					for (int i = 0; i < books.length; i++){
+						books[i] = recList.get(i);
+					}
+					Intent i = new Intent(getBaseContext(), BookInfoActivity.class);
+					i.putExtra("info", info);
+					i.putParcelableArrayListExtra("recs", recList);
+					startActivity(i);
+					
 				} catch (InterruptedException e) {
 					Log.e(TAG, "rec future interrupted: " + e.getMessage());
 				} catch (ExecutionException e) {
 					Log.e(TAG, "rec future execution exception: " + e.getMessage());
-					e.printStackTrace();
 				}
 				_recFuture = null;
-				
+				_infoFuture = null;
 				
 			}
 			
@@ -103,7 +113,7 @@ public class MainActivity extends Activity {
 		
 	}
 	
-	//result of scanning
+	//submit scanning result to rec page
 	public void onActivityResult(int requestCode, int resultCode, Intent intent) {
 		  IntentResult scanResult = IntentIntegrator.parseActivityResult(requestCode, resultCode, intent);
 		  if (scanResult != null) {
@@ -111,9 +121,9 @@ public class MainActivity extends Activity {
 			  Log.d(TAG, "Scan result was: " + barcode);
 			  Callable<List<Book>> getRecTask = new RecTask(barcode);
 			  _recFuture = _executor.submit(getRecTask);
-		    // handle scan result
+			  Callable<Book> getInfoTask = new InfoTask(barcode);
+			  _infoFuture = _executor.submit(getInfoTask);
 		  }
-		  // else continue with any other code you need in the method
 		}
 
 }
