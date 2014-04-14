@@ -29,13 +29,12 @@ class Recommendations(webapp2.RequestHandler):
 
     def post(self):
         num = self.request.get('call_no')
-        recs = alz.get_recs(num, item_map, item_info, lookup_info)
-        print "recs are..." , recs
-        self.response.write(json.dumps(recs))
-        #for rec in recs:
-        #    self.response.write("<p>")
-        #    self.response.write(rec)
-        #    self.response.write("</p>")
+        if num == "":
+            self.response.write(json.dumps(""))
+        else:
+            recs = alz.get_recs(num, item_map, item_info, lookup_info)
+            print "there are" , len(recs), "recs"
+            self.response.write(json.dumps(recs))
 
 item_map, item_info, lookup_info = alz.init()
 print "init finished"

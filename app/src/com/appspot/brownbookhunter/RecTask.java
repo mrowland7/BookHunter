@@ -8,11 +8,14 @@ import java.util.List;
 import java.util.concurrent.Callable;
 
 import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -22,20 +25,29 @@ import android.util.Log;
 public class RecTask implements Callable<List<Book>> {
 
 	private static final String TAG = "RecTask";
-
+	private String searchTerm;
+	public RecTask(String searchTerm) {
+		this.searchTerm = searchTerm;
+		
+	}
 	@Override
-	public List<Book> call(String callNumber) throws Exception {
+	public List<Book> call() throws Exception {
 		JSONObject recInfo = null;
 		List<Book> bookRecs = new ArrayList<Book>();
 		String recUrl = "http://brownbookhunter.appspot.com/recs";
 		HttpClient hc = new DefaultHttpClient();
 		try{
 			HttpPost request = new HttpPost(recUrl);
-			JSONObject params = new JSONObject();
-			params.put("call_no", "BH39 .S322 1999");
-			StringEntity se = new StringEntity(params.toString());
-			request.addHeader("content-type", "application/x-www-form-urlencoded");
-			request.setEntity(se);
+			
+			List<NameValuePair> params = new ArrayList<NameValuePair>(2);
+			params.add(new BasicNameValuePair("call_no", searchTerm));
+			request.setEntity(new UrlEncodedFormEntity(params, "UTF-8"));
+			
+//			JSONObject params = new JSONObject();
+//			params.put("call_no", searchTerm);
+//			StringEntity se = new StringEntity(params.toString());
+//			//request.addHeader("content-type", "application/x-www-form-urlencoded");
+//			request.setEntity(se);
 			HttpResponse response = hc.execute(request);
 			
 			
