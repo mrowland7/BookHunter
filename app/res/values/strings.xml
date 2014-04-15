@@ -8,6 +8,10 @@
     <string name="get_recs">Similar Works</string>
     <string name="get_started">Scan a barcode to get started!</string>
     <string name="book_info">Book Information</string>
-     <string name="email">Email citation</string>
+    <string name="email">Email citation</string>
+    <string name="info">More info</string>
+    <string name="interested">You may also be interested in...</string>
+    <string name="detail">Book Details</string>
+    <string name="scan_again">Scan another</string>
 
 </resources>

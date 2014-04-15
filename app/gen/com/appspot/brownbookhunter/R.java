@@ -40,13 +40,26 @@ public final class R {
         public static final int ic_launcher=0x7f020001;
     }
     public static final class id {
-        public static final int action_settings=0x7f090006;
-        public static final int author=0x7f090001;
-        public static final int email=0x7f090003;
-        public static final int get_started=0x7f090004;
-        public static final int info=0x7f090002;
-        public static final int scan=0x7f090005;
-        public static final int title=0x7f090000;
+        public static final int action_settings=0x7f090013;
+        public static final int author=0x7f090002;
+        public static final int call_no=0x7f090004;
+        public static final int cite_info=0x7f090003;
+        public static final int detail=0x7f090000;
+        public static final int email=0x7f090005;
+        public static final int get_started=0x7f090011;
+        public static final int rec1=0x7f090008;
+        public static final int rec1button=0x7f090009;
+        public static final int rec1layout=0x7f090007;
+        public static final int rec2=0x7f09000b;
+        public static final int rec2button=0x7f09000c;
+        public static final int rec2layout=0x7f09000a;
+        public static final int rec3=0x7f09000e;
+        public static final int rec3button=0x7f09000f;
+        public static final int rec3layout=0x7f09000d;
+        public static final int scan=0x7f090012;
+        public static final int scan_again=0x7f090010;
+        public static final int similar=0x7f090006;
+        public static final int title=0x7f090001;
     }
     public static final class layout {
         public static final int activity_book_info=0x7f030000;
@@ -59,11 +72,15 @@ public final class R {
         public static final int action_settings=0x7f060001;
         public static final int app_name=0x7f060000;
         public static final int book_info=0x7f060006;
+        public static final int detail=0x7f06000a;
         public static final int email=0x7f060007;
         public static final int get_recs=0x7f060004;
         public static final int get_started=0x7f060005;
         public static final int hello_world=0x7f060002;
+        public static final int info=0x7f060008;
+        public static final int interested=0x7f060009;
         public static final int scan=0x7f060003;
+        public static final int scan_again=0x7f06000b;
     }
     public static final class style {
         /** 

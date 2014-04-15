@@ -7,32 +7,175 @@
     tools:context=".BookInfoActivity" >
 
     <TextView
+        android:id="@+id/detail"
+        style="@style/InfoText"
+        android:textSize="24sp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/detail"/> 
+        
+    <TextView
         android:id="@+id/title"
         style="@style/InfoText"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:text="Title" />
 
     <TextView
         android:id="@+id/author"
         style="@style/InfoText"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:text="Author" />
 
     <TextView
-        android:id="@+id/info"
+        android:id="@+id/cite_info"
         style="@style/InfoText"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:text="New York: Bantam Books, 1924" />
+
+    <TextView
+        android:id="@+id/call_no"
+        style="@style/InfoText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Brown Call Number: BH39 .S322 1922" />
 
     <Button
         android:id="@+id/email"
         style="@style/InfoText"
-        android:textColor="@color/white"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
         android:background="@drawable/blue_button"
         android:onClick="email"
-        android:text="@string/email" />
+        android:text="@string/email"
+        android:textColor="@color/white" />
 
+    <TextView
+        android:id="@+id/similar"
+        style="@style/InfoText"
+        android:textSize="24sp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="60dp"
+        android:text="@string/interested"/>
+
+    <LinearLayout
+        android:id="@+id/rec1layout"
+        android:layout_width="match_parent"
+        android:layout_height="30dp"
+        android:layout_marginTop="10dp"
+        android:gravity="center_horizontal"
+        android:orientation="horizontal" >
+
+        <TextView
+            android:id="@+id/rec1"
+            style="@style/InfoText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:text="First Recommendation" />
+
+        
+        <View
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            />     
+        <Button
+            android:id="@+id/rec1button"
+            style="@style/InfoText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:background="@drawable/blue_button"
+            android:onClick="newInfo1"
+            android:text="@string/info"
+            android:textColor="@color/white" />
+    </LinearLayout>
+
+   <LinearLayout
+        android:id="@+id/rec2layout"
+        android:layout_width="match_parent"
+        android:layout_height="30dp"
+        android:layout_marginTop="10dp"
+        android:gravity="center_horizontal"
+        android:orientation="horizontal" >
+
+        <TextView
+            android:id="@+id/rec2"
+            style="@style/InfoText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:text="Second Recommendation" />
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            />  
+        <Button
+            android:id="@+id/rec2button"
+            style="@style/InfoText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:background="@drawable/blue_button"
+            android:onClick="newInfo2"
+            android:text="@string/info"
+            android:textColor="@color/white" />
+    </LinearLayout>
+    
+   <LinearLayout
+        android:id="@+id/rec3layout"
+        android:layout_width="match_parent"
+        android:layout_height="30dp"
+        android:layout_marginTop="10dp"
+        android:gravity="center_horizontal"
+        android:orientation="horizontal" >
+
+        <TextView
+            android:id="@+id/rec3"
+            style="@style/InfoText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:text="Third Recommendation" />
+        
+        <View
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            /> 
+
+        <Button
+            android:id="@+id/rec3button"
+            style="@style/InfoText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:background="@drawable/blue_button"
+            android:onClick="newInfo3"
+            android:text="@string/info"
+            android:textColor="@color/white" />
+    </LinearLayout>
+    
+    <Button
+            android:id="@+id/scan_again"
+            style="@style/InfoText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="60dp"
+            android:background="@drawable/blue_button"
+            android:onClick="scanAgain"
+            android:text="@string/scan_again"
+            android:textColor="@color/white" />
+    
+   
 </LinearLayout>

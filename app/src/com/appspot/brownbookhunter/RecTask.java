@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.Callable;
 
@@ -39,22 +40,21 @@ public class RecTask implements Callable<List<Book>> {
 		try{
 			HttpPost request = new HttpPost(recUrl);
 			
-			List<NameValuePair> params = new ArrayList<NameValuePair>(2);
+			List<NameValuePair> params = new ArrayList<NameValuePair>(1);
 			params.add(new BasicNameValuePair("call_no", searchTerm));
 			request.setEntity(new UrlEncodedFormEntity(params, "UTF-8"));
 
 			HttpResponse response = hc.execute(request);
-			
 			
 			recInfo = readResponse(response);
 			JSONArray actualResult = (JSONArray) recInfo.get("thing");
 			for (int i = 0; i < actualResult.length(); i++){
 				bookRecs.add(new Book((JSONObject) actualResult.get(i)));
 			}
-			JSONObject firstThing = (JSONObject) actualResult.get(0);
 			
-			Log.d(TAG, "Hopefully this is something?" + firstThing);
+			Collections.sort(bookRecs);
 			
+			Log.d(TAG, "search term was " + searchTerm);
 			
 		} catch (JSONException e) {
 			Log.e(TAG, "Json exception: " + e.getMessage());
@@ -81,7 +81,6 @@ public class RecTask implements Callable<List<Book>> {
 			result.append((char) c);
 		}
 		result.append("}");
-		Log.d(TAG, "Result length is " + result.toString().length());
 		return new JSONObject(result.toString());
 	}
 }

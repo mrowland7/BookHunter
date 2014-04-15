@@ -101,7 +101,6 @@ def process_csv(a_csv, curr_checkout_id, person_index):
         recent_checkouts = line[13]
         cite_info = line[15:20]
         isbn_dirty = line[22]
-        
 
         #construct dictionaries of call no / isbn -> item ids
         clean_call_no = cleanup_call_no(call_no)
@@ -129,7 +128,7 @@ def process_csv(a_csv, curr_checkout_id, person_index):
             item_info[item_id] = {"call_no": call_no, "author": cite_info[0], "title": clean_title,
                 "pub_place": cite_info[2], "publisher": cite_info[3], "year": cite_info[4],
                 "all_time_checkouts": all_time_checkouts, "recent_checkouts":recent_checkouts, 
-                "isbn_dirty":isbn_dirty}
+                "isbn_dirty":isbn_dirty, "barcode":barcode}
         #add checkout information
         if item_id not in items:
             items[item_id] = [curr_checkout_id]
@@ -188,7 +187,6 @@ def get_pretty_matches(matches):
     return [x[1] for x in matches]
 
 def get_recs(search_term, item_map, item_info, lookup_info):
-    print "search term is >", search_term, "<"
     search_term_call_no = cleanup_call_no(search_term)
     ids = []
     if search_term in lookup_info:

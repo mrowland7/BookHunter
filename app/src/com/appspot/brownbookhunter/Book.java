@@ -15,6 +15,8 @@ public class Book implements Comparable<Book>, Parcelable{
 	private String publisher;
 	private String publisherPlace;
 	private String title;
+	private String year;
+	private String barcode;
 
 	public Book(JSONObject j) throws JSONException {
 		allTimeCheckouts = Integer.parseInt((String) j.get("all_time_checkouts"));
@@ -25,10 +27,12 @@ public class Book implements Comparable<Book>, Parcelable{
 		publisher = (String) j.get("publisher");
 		publisherPlace = (String) j.get("pub_place");
 		title = (String) j.get("title");
+		year  = (String) j.get("year");
+		barcode  = (String) j.get("barcode");
 	}
 
 	public Book(Parcel in) {
-		String[] data = new String[8];
+		String[] data = new String[10];
 		in.readStringArray(data);
 		allTimeCheckouts = Integer.parseInt(data[0]);
 		recentCheckouts  = Integer.parseInt(data[1]);
@@ -38,6 +42,8 @@ public class Book implements Comparable<Book>, Parcelable{
 		publisher = data[5];
 		publisherPlace = data[6];
 		title = data[7];
+		year = data[8];
+		barcode = data[9];
 	}
 
 	//negative if less than
@@ -77,10 +83,16 @@ public class Book implements Comparable<Book>, Parcelable{
 	public String getTitle() {
 		return title;
 	}
+	
+	public String getYear() {
+		return year;
+	}
 
+	public String getBarcode() {
+		return barcode;
+	}
 	@Override
 	public int describeContents() {
-		// TODO Auto-generated method stub
 		return 0;
 	}
 
@@ -94,7 +106,9 @@ public class Book implements Comparable<Book>, Parcelable{
 				author,
 				publisher,
 				publisherPlace,
-				title
+				title,
+				year,
+				barcode
 		});
 	}
 
@@ -110,5 +124,7 @@ public class Book implements Comparable<Book>, Parcelable{
 			return new Book[size];
 		}
 	};
+
+	
 
 }
